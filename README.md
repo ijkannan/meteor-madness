@@ -11,7 +11,7 @@ Features
 - Error handling and schema validation for robust data exploration
 - Built with **Streamlit** for a clean, responsive UI
 
-🛠️ Tech Stack
+Tech Stack
 - **Python 3.10+**
 - **Streamlit** for the web app
 - **pandas** for data wrangling
