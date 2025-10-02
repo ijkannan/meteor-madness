@@ -22,16 +22,6 @@ def load_data():
             st.error(f"Failed to read local file: {e}")
             df = None
 
-    if df is None:  # fallback to NASA online
-        try:
-            st.warning("Local file not found. Fetching from NASA dataset...")
-            r = requests.get(REMOTE_URL, timeout=15)
-            r.raise_for_status()
-            df = pd.read_csv(io.StringIO(r.text))
-        except Exception:
-            st.error("Could not load dataset from NASA either. Please add meteorite-landings.csv locally.")
-            return pd.DataFrame()
-
     # Normalize column names
     df.columns = [c.strip().lower() for c in df.columns]
 
@@ -83,9 +73,12 @@ if df.empty:
 
 # Sidebar filters
 st.sidebar.header("Filters")
-min_year = int(df["year"].min(skipna=True)) if "year" in df else 0
+min_year = int(df["year"].min(skipna=True)) if "year" in df else 1800
 max_year = int(df["year"].max(skipna=True)) if "year" in df else 2025
 year_range = st.sidebar.slider("Year range", min_year, max_year, (min_year, max_year))
+
+if min_year==max_year:
+    st.sidebar.warning("Year range slider disabled (all data from same year).")
 
 min_mass = int(df["mass"].min(skipna=True)) if "mass" in df else 0
 max_mass = int(df["mass"].max(skipna=True)) if "mass" in df else 10000000
