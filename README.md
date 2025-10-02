@@ -15,4 +15,4 @@ Tech Stack
 - **Python 3.10+**
 - **Streamlit** for the web app
 - **pandas** for data wrangling
-- **geopandas / folium / pydeck** for mapping
+- **geopandas / folium ** for mapping
