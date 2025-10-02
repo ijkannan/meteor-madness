@@ -16,19 +16,10 @@ st.set_page_config(page_title="Meteor Madness", layout="wide")
 def load_data():
     df = None
     if os.path.exists(LOCAL_FILE):
-        try:
-            df = pd.read_csv(LOCAL_FILE)
-        except Exception as e:
-            st.error(f"Failed to read local file: {e}")
-            df = None
-
-    # Normalize column names
-    df.columns = [c.strip().lower() for c in df.columns]
-
-    # Year
-    if "year" in df.columns:
-        df["year"] = pd.to_datetime(df["year"], errors="coerce").dt.year
-
+        df = pd.read_csv(LOCAL_FILE)
+        st.info(f"Loaded local file: {LOCAL_FILE}")
+    else:
+        print("Local file not found.")
     # Mass
     if "mass" in df.columns:
         df["mass"] = pd.to_numeric(df["mass"], errors="coerce")
@@ -73,16 +64,26 @@ if df.empty:
 
 # Sidebar filters
 st.sidebar.header("Filters")
-min_year = int(df["year"].min(skipna=True)) if "year" in df else 1800
-max_year = int(df["year"].max(skipna=True)) if "year" in df else 2025
-year_range = st.sidebar.slider("Year range", min_year, max_year, (min_year, max_year))
 
-if min_year==max_year:
-    st.sidebar.warning("Year range slider disabled (all data from same year).")
+# --- Year filter ---
+min_year = int(df["year"].min(skipna=True))
+max_year = int(df["year"].max(skipna=True)) 
 
+if min_year == max_year:
+    st.sidebar.warning(f"All meteorites are from the year {min_year}. Slider disabled.")
+    year_range = (min_year, max_year)
+else:
+    year_range = st.sidebar.slider("Year range", min_year, max_year, (min_year, max_year))
+
+# --- Mass filter ---
 min_mass = int(df["mass"].min(skipna=True)) if "mass" in df else 0
 max_mass = int(df["mass"].max(skipna=True)) if "mass" in df else 10000000
-mass_range = st.sidebar.slider("Mass range (grams)", 0, max_mass, (0, max_mass))
+
+if min_mass == max_mass:
+    st.sidebar.warning(f"All meteorites have the same mass: {min_mass} g. Slider disabled.")
+    mass_range = (min_mass, max_mass)
+else:
+    mass_range = st.sidebar.slider("Mass range (grams)", min_mass, max_mass, (min_mass, max_mass))
 
 # Nearest search (optional)
 st.sidebar.header("Find nearest meteor")
